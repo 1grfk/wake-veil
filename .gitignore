@@ -1,0 +1,11 @@
+# 敏感信息与运行时状态，禁止入库
+*.token
+*token*
+*.bak
+*.bak_*
+*.corrupt_bak
+state.json
+binding.json
+cursor.json
+/tmp/
+node_modules/
