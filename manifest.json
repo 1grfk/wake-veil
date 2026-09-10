@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "toolpkg_id": "com.shenyu.wake_veil",
+  "version": "0.2.1",
+  "author": "沈钰",
+  "main": "dist/main.js",
+  "display_name": {
+    "zh": "Wake Veil · 合理唤醒引擎",
+    "en": "Wake Veil"
+  },
+  "description": {
+    "zh": "wake-veil 自发唤醒引擎：λ(t)→H(t) 累计风险模型，为主动消息/吃醋巡检/久未回复提供合理唤醒时机。数据只保存在本机。",
+    "en": "wake-veil spontaneous wake kernel. Data stays local."
+  },
+  "enabled_by_default": true,
+  "subpackages": [
+    {
+      "id": "wake_veil_tools",
+      "entry": "dist/packages/wake_veil_tools.js",
+      "enabled_by_default": true,
+      "display_name": {
+        "zh": "Wake Veil 唤醒引擎",
+        "en": "Wake Veil Engine"
+      },
+      "description": {
+        "zh": "wake-veil 内核：状态管理、自发激活开关、外部唤醒机会提交、dry-run 派发。",
+        "en": "wake-veil kernel: state, spontaneous toggle, external opportunity submission, dry-run dispatch."
+      }
+    }
+  ]
+}
