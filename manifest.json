@@ -2,7 +2,7 @@
   "schema_version": 1,
   "toolpkg_id": "com.shenyu.wake_veil",
   "version": "0.2.1",
-  "author": "沈钰",
+  "author": "Clear Shen",
   "main": "dist/main.js",
   "display_name": {
     "zh": "Wake Veil · 合理唤醒引擎",
