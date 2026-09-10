@@ -37,7 +37,7 @@ function entropyDigest(seed, domain, stepIndex, lane) {
 }
 
 function uniformFromDigest(digest) {
-  if (!Buffer.isBuffer(digest) || digest.length < 8) throw new TypeError('digest must contain at least 8 bytes');
+  if (!(digest instanceof Uint8Array) || digest.length < 8) throw new TypeError('digest must contain at least 8 bytes');
   const n64 = digest.readBigUInt64BE(0);
   const n53 = n64 >> 11n;
   const value = (Number(n53) + 0.5) / 9007199254740992;
@@ -53,7 +53,7 @@ function normalFromSeed(seed, domain, stepIndex) {
 }
 
 function thresholdUniformFromBytes(bytes) {
-  if (!Buffer.isBuffer(bytes) || bytes.length < 8) throw new TypeError('threshold entropy must contain at least 8 bytes');
+  if (!(bytes instanceof Uint8Array) || bytes.length < 8) throw new TypeError('threshold entropy must contain at least 8 bytes');
   return uniformFromDigest(bytes);
 }
 
@@ -65,8 +65,8 @@ function createEntropyRecord(options = {}) {
   if (!cycleId) throw new TypeError('cycleId is required');
   const thresholdBytes = randomBytes(8);
   const seedBytes = randomBytes(32);
-  if (!Buffer.isBuffer(thresholdBytes) || thresholdBytes.length !== 8) throw new TypeError('randomBytes(8) returned invalid data');
-  if (!Buffer.isBuffer(seedBytes) || seedBytes.length !== 32) throw new TypeError('randomBytes(32) returned invalid data');
+  if (!(thresholdBytes instanceof Uint8Array) || thresholdBytes.length !== 8) throw new TypeError('randomBytes(8) returned invalid data');
+  if (!(seedBytes instanceof Uint8Array) || seedBytes.length !== 32) throw new TypeError('randomBytes(32) returned invalid data');
   return Object.freeze({
     cycleId,
     thresholdSample: -Math.log(thresholdUniformFromBytes(thresholdBytes)) * 1.4,
