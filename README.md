@@ -86,3 +86,13 @@
 - **9-08**：接入 UI 配置读取（`readWvConfig`→`effectiveThreshold`）。
 - **9-09**：新增 `TH_MULT` 阈值系数、`MIN_GAP_MS`/`MAX_GAP_MS` 3 小时封顶增强（当前版本）。
 - **9-10**：整合治理完成——清除全部旧拷贝/备份/临时文件，只保留唯一真身（本仓库）+ dev 源码 + 运行时状态三处正式件；同日归档到 GitHub，补充 docs/USAGE.md 使用说明。
+## 🛡️ 自愈哨兵（2026-09-11 新增）
+
+内核可能因设备重启/后台被杀掉回 `disabled_effective`（2026-09-11 实例：晚上自发唤醒失败，报 `spontaneous not enabled, tick skipped`）。
+
+解决：新增定时工作流 `wake_veil_self_heal_sentinel.json`（每30分钟）：
+- 读 `state.json` 检查 `mode`
+- 若 `mode != enabled` → 自动 `wake_enable(spontaneousEnabled=true)` + `wake_set_spontaneous(true)` + 确保 `dry_run=true`（安全模式，不直接推消息）
+- 正常则静默放行，零模型调用、不耗预算
+
+安装：导入该 JSON 到 Operit 工作流并启用即可。

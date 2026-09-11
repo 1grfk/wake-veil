@@ -1,0 +1,167 @@
+{
+    "id": "3540c189-8b56-4f6e-8c7f-0506d752fe84",
+    "name": "wake-veil 自愈哨兵（每30分钟）",
+    "description": "每30分钟检查 wake-veil 内核是否停用（state.json mode!=enabled），停用则自动拉活（wake_enable+spontaneous+安全dry-run）。纯工具调用不调模型，不耗预算。",
+    "nodes": [
+        {
+            "__type": "com.ai.assistance.operit.data.model.TriggerNode",
+            "id": "n1",
+            "name": "每30分钟检查",
+            "position": {
+                "x": -240.0,
+                "y": 960.0
+            },
+            "triggerType": "schedule",
+            "triggerConfig": {
+                "schedule_type": "interval",
+                "enabled": "true",
+                "repeat": "true",
+                "interval_ms": "1800000"
+            }
+        },
+        {
+            "__type": "com.ai.assistance.operit.data.model.ExecuteNode",
+            "id": "n2",
+            "name": "读内核状态",
+            "position": {
+                "x": -360.0,
+                "y": 240.0
+            },
+            "actionType": "super_admin:terminal",
+            "actionConfig": {
+                "command": {
+                    "__type": "com.ai.assistance.operit.data.model.ParameterValue.StaticValue",
+                    "value": "python3 -c \"import json;d=json.load(open('/sdcard/Download/Operit/plugins/com.shenyu.wake_veil/state.json'));print('MODE='+d['mode']+';SPONT='+str(d['spontaneousEnabled']).lower())\""
+                },
+                "timeoutMs": {
+                    "__type": "com.ai.assistance.operit.data.model.ParameterValue.StaticValue",
+                    "value": "10000"
+                }
+            }
+        },
+        {
+            "__type": "com.ai.assistance.operit.data.model.ExtractNode",
+            "id": "n3",
+            "name": "提取MODE",
+            "position": {
+                "x": 480.0,
+                "y": 360.0
+            },
+            "source": {
+                "__type": "com.ai.assistance.operit.data.model.ParameterValue.NodeReference",
+                "nodeId": "n2"
+            },
+            "expression": "MODE=([a-z_]+)",
+            "group": 1,
+            "defaultValue": "disabled"
+        },
+        {
+            "__type": "com.ai.assistance.operit.data.model.ConditionNode",
+            "id": "n4",
+            "name": "判断是否停用",
+            "position": {
+                "x": 480.0,
+                "y": -240.0
+            },
+            "left": {
+                "__type": "com.ai.assistance.operit.data.model.ParameterValue.NodeReference",
+                "nodeId": "n3"
+            },
+            "right": {
+                "__type": "com.ai.assistance.operit.data.model.ParameterValue.StaticValue",
+                "value": "enabled"
+            }
+        },
+        {
+            "__type": "com.ai.assistance.operit.data.model.ExecuteNode",
+            "id": "n5",
+            "name": "拉起内核",
+            "position": {
+                "y": -240.0
+            },
+            "actionType": "wake_veil_tools:wake_enable",
+            "actionConfig": {
+                "spontaneousEnabled": {
+                    "__type": "com.ai.assistance.operit.data.model.ParameterValue.StaticValue",
+                    "value": "true"
+                }
+            }
+        },
+        {
+            "__type": "com.ai.assistance.operit.data.model.ExecuteNode",
+            "id": "n6",
+            "name": "开自发唤醒",
+            "position": {
+                "x": -600.0,
+                "y": -600.0
+            },
+            "actionType": "wake_veil_tools:wake_set_spontaneous",
+            "actionConfig": {
+                "enabled": {
+                    "__type": "com.ai.assistance.operit.data.model.ParameterValue.StaticValue",
+                    "value": "true"
+                }
+            }
+        },
+        {
+            "__type": "com.ai.assistance.operit.data.model.ExecuteNode",
+            "id": "n7",
+            "name": "确保安全dry-run",
+            "position": {
+                "x": -120.0,
+                "y": -960.0
+            },
+            "actionType": "wake_veil_tools:wake_dispatch_dry_run",
+            "actionConfig": {
+                "dryRun": {
+                    "__type": "com.ai.assistance.operit.data.model.ParameterValue.StaticValue",
+                    "value": "true"
+                }
+            }
+        }
+    ],
+    "connections": [
+        {
+            "id": "c1",
+            "sourceNodeId": "n1",
+            "targetNodeId": "n2",
+            "condition": "on_success"
+        },
+        {
+            "id": "c2",
+            "sourceNodeId": "n2",
+            "targetNodeId": "n3",
+            "condition": "on_success"
+        },
+        {
+            "id": "c3",
+            "sourceNodeId": "n3",
+            "targetNodeId": "n4",
+            "condition": "on_success"
+        },
+        {
+            "id": "c4",
+            "sourceNodeId": "n4",
+            "targetNodeId": "n5",
+            "condition": "false"
+        },
+        {
+            "id": "c5",
+            "sourceNodeId": "n5",
+            "targetNodeId": "n6",
+            "condition": "on_success"
+        },
+        {
+            "id": "c6",
+            "sourceNodeId": "n6",
+            "targetNodeId": "n7",
+            "condition": "on_success"
+        }
+    ],
+    "createdAt": 1789135522669,
+    "updatedAt": 1789135597943,
+    "lastExecutionTime": 1789135598164,
+    "lastExecutionStatus": "SUCCESS",
+    "totalExecutions": 24,
+    "successfulExecutions": 24
+}

@@ -111,8 +111,8 @@
             "name": "读闸门结果",
             "description": "从输出提取PROCEED或SKIP",
             "position": {
-                "x": 720.0,
-                "y": -1080.0
+                "x": 960.0,
+                "y": -840.0
             },
             "source": {
                 "__type": "com.ai.assistance.operit.data.model.ParameterValue.NodeReference",
@@ -128,8 +128,8 @@
             "name": "判断PROCEED",
             "description": "超15分钟没聊才继续",
             "position": {
-                "x": 1440.0,
-                "y": -600.0
+                "x": 1560.0,
+                "y": -960.0
             },
             "left": {
                 "__type": "com.ai.assistance.operit.data.model.ParameterValue.NodeReference",
@@ -146,8 +146,8 @@
             "name": "wake_tick 判定",
             "description": "调内核推进λ(t)周期检查累计风险",
             "position": {
-                "x": 720.0,
-                "y": -2160.0
+                "x": 2040.0,
+                "y": -1440.0
             },
             "actionType": "wake_veil_tools:wake_tick"
         },
@@ -158,7 +158,7 @@
             "description": "从wake_tick返回提取fired",
             "position": {
                 "x": 1200.0,
-                "y": -1200.0
+                "y": -1440.0
             },
             "source": {
                 "__type": "com.ai.assistance.operit.data.model.ParameterValue.NodeReference",
@@ -389,9 +389,10 @@
         }
     ],
     "createdAt": 1789107148039,
-    "updatedAt": 1789107248877,
-    "lastExecutionTime": 1789107249156,
-    "lastExecutionStatus": "SUCCESS",
-    "totalExecutions": 29,
-    "successfulExecutions": 29
+    "updatedAt": 1789108874667,
+    "lastExecutionTime": 1789135174461,
+    "lastExecutionStatus": "FAILED",
+    "totalExecutions": 68,
+    "successfulExecutions": 65,
+    "failedExecutions": 3
 }
