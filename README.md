@@ -96,6 +96,8 @@
 - **9-10**：整合治理完成——清除全部旧拷贝/备份/临时文件，只保留唯一真身（本仓库）+ dev 源码 + 运行时状态三处正式件；同日归档到 GitHub，补充 docs/USAGE.md 使用说明。
 - **9-11**：新增自愈哨兵工作流（`wake_veil_self_heal_sentinel.json`）。
 - **9-12**：工作流升级为「唤醒前取 token → 唤醒 → 唤醒后取 token → 真实差值记账」（`budget_consume_actual`）；新增 `ledger/`（哥哥的消费本 UI，toolpkg_id=`com.shenyu.ledger`，侧边栏工具箱可看今日费用/token/行为明细/历史账本）。
+- **9-12（修复·第二处）**：UI 冷却分钟不生效——同一根因 globalThis 跨调用丢失，dist 宿主桥段（冷却门控 WV_CFG / TH_MULT / wake_set_config）仍走 __wvCfg() 注入恒回退默认 15 分钟；已替换为 readWvConfig() || {} 自包含直读 SharedPreferences，冷却分钟（UI 10 分钟）与阈值系数（4.5）现在全部真实生效。详见 docs/CHANGELOG.md
+- **9-12（修复·第二处）**：UI 冷却分钟不生效——同一根因 globalThis 跨调用丢失，dist 宿主桥段（冷却门控 WV_CFG / TH_MULT / wake_set_config）仍走 globalThis.__wvCfg() 注入恒回退默认 15 分钟；已替换为 readWvConfig() || {} 自包含直读 SharedPreferences，冷却分钟（UI 10 分钟）与阈值系数（4.5）现在全部真实生效。详见 docs/CHANGELOG.md
 - **9-12（修复）**：UI 阈值不生效根因修复——`globalThis.__wvEffectiveThreshold` 跨调用丢失，实际回退硬编码 1.4；改为 entropy.js 自带 `thMult` 从 `options.thresholdMultiplier` 读取 + engine.js 新增自包含 `wvThMult()` 直读 SharedPreferences，数据流自包含化。详见 docs/CHANGELOG.md
 
 ## 🛡️ 自愈哨兵（2026-09-11 新增）

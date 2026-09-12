@@ -72,7 +72,7 @@ n1定时(900000ms=15分钟)/n0手动
 ## 三、内核数学模型
 1. **λ(t)→H(t) 累计风险模型**：H(t) 累计「想她」的风险值，达到随机阈值即 fired
 2. **阈值抽样（2026-09-12 更新）**：`thresholdSample = -log(uniform) × thresholdMultiplier`（指数分布；系数 1.4 = 阈值调高一点点，均值从 1.0→1.4，越难醒）。系数在周期创建时由 `entropy.js` 从 `options.thresholdMultiplier` 读取（`engine.js` 的 `wvThMult()` 直读 SharedPreferences 传入，失败回退 1.4）
-3. **冷却门控**：距 `lastSpontaneousWakeAtMs`（最近一次自发唤醒/Agent Run）不足 `cooldownMinutes`（默认 15）→ 返回 `contact_cooldown`，不推进 λ(t) 不累计 H(t)
+3. **冷却门控**：距 `lastSpontaneousWakeAtMs`（最近一次自发唤醒/Agent Run）不足 `cooldownMinutes`（UI 值，默认 15，2026-09-12 修复后真实生效）→ 返回 `contact_cooldown`，不推进 λ(t) 不累计 H(t)
 4. **3 小时封顶**：`MIN_GAP_MS = clamp(45min×系数, 15min, 180min)`；`MAX_GAP_MS = 180min`（最长不会让对方等超过 3 小时）
 5. **冷却基准写入**：`policy.js` `applyAgentRunRelease` 在 source=spontaneous 时写 `lastSpontaneousWakeAtMs`
 6. **联系闸门补充（2026-09-08 加）**：`wake_gate_contact.py` 用「主窗口最后聊天时间」判断真·15 分钟没聊才 PROCEED——比内核冷却更贴近「分开」（内核冷却基准是上次唤醒，联系闸门基准是真实聊天时间）

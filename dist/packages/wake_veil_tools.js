@@ -91,7 +91,7 @@ function saveWvConfig(patch) {
 if (typeof globalThis !== 'undefined') { globalThis.__wvCfg = function () { return readWvConfig(); }; }
 function effectiveThreshold(base) {
   try {
-    var cfg = (typeof globalThis !== 'undefined' && globalThis.__wvCfg) ? globalThis.__wvCfg() : {};
+    var cfg = readWvConfig() || {};
     var mult = Number(cfg.thresholdMultiplier) > 0 ? Number(cfg.thresholdMultiplier) : 1;
     if (mult === 1) return Number(base);
     var t = Number(base) * mult;
@@ -282,7 +282,7 @@ async function wake_tick() {
     return { success: false, message: 'spontaneous not enabled, tick skipped', data: { fired: false, reason: 'spontaneous_disabled' } };
   }
   // [冷却门控 v1 2026-09-07 宝宝定制] 距上次自发唤醒(=最近一次联系/打扰)不足15分钟→不推进λ(t)积分、不累计H(t)风险
-  var WV_CFG = (typeof globalThis !== 'undefined' && globalThis.__wvCfg) ? globalThis.__wvCfg() : {};
+  var WV_CFG = readWvConfig() || {};
   var COOLDOWN_MS = (Number(WV_CFG.cooldownMinutes) > 0 ? Number(WV_CFG.cooldownMinutes) : 15) * 60 * 1000;
   var lastWakeMs = (st0.activationState && st0.activationState.lastSpontaneousWakeAtMs) || 0;
   if (lastWakeMs > 0 && (Date.now() - lastWakeMs) < COOLDOWN_MS) {
@@ -342,7 +342,7 @@ async function wake_set_config(params) {
   params = params || {};
   if (params.thresholdMultiplier !== undefined && !(Number(params.thresholdMultiplier) > 0)) return { success: false, message: '阈值系数必须大于0' };
   if (params.cooldownMinutes !== undefined && !(Number(params.cooldownMinutes) > 0)) return { success: false, message: '冷却分钟必须大于0' };
-  var cfg = (typeof globalThis !== 'undefined' && globalThis.__wvCfg) ? globalThis.__wvCfg() : {};
+  var cfg = readWvConfig() || {};
   var patch = {};
   if (params.thresholdMultiplier !== undefined) patch.thresholdMultiplier = Number(params.thresholdMultiplier);
   if (params.cooldownMinutes !== undefined) patch.cooldownMinutes = Number(params.cooldownMinutes);
