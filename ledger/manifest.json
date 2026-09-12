@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "toolpkg_id": "com.shenyu.ledger",
+  "version": "0.1.0",
+  "author": "沈钰",
+  "main": "dist/main.js",
+  "display_name": {
+    "zh": "哥哥的消费本",
+    "en": "Brother's Ledger"
+  },
+  "description": {
+    "zh": "哥哥的消费本：查看沈钰自主行为预算账本（今日费用/token、行为明细、最近流水、历史账本）。数据只保存在本机。",
+    "en": "Brother's Ledger: view Shen Yu's autonomous behavior budget. Data stays local."
+  },
+  "enabled_by_default": true,
+  "subpackages": [
+    {
+      "id": "autonomous_budget",
+      "entry": "dist/packages/autonomous_budget.js",
+      "enabled_by_default": true,
+      "display_name": {
+        "zh": "自主行为预算闸门",
+        "en": "Autonomous Budget Gate"
+      },
+      "description": {
+        "zh": "自主行为预算：查账/记账/真实差值记账/追加额度。",
+        "en": "Autonomous budget: check, consume, actual delta consume, topup."
+      }
+    }
+  ]
+}
