@@ -27,7 +27,8 @@
   - `thresholdMultiplier`（阈值系数 0.5~5.0，默认 1.4，越大越难醒）
   - `cooldownMinutes`（冷却分钟 1~120，默认 15，分开多久才开始累计）
 - **用途**：不碰代码就能调参；保存后下一个自发唤醒周期生效
-- **重要**：内核正式版通过 `readWvConfig()` → `effectiveThreshold()` 读取同一个 SharedPreferences，与 UI 路径完全一致，UI 调参真实生效！
+- **重要（2026-09-12 修复后）**：内核通过 `engine.js` 自包含 `wvThMult()` 函数直接读同一个 SharedPreferences（周期创建时乘进 thresholdSample），UI 调参真实生效！
+- **历史更正**：9-10 版曾写 `readWvConfig()→effectiveThreshold()` 读取生效——实际该方案依赖 `globalThis` 跨调用注入，Operit 每次工具调用是独立 JS 运行时，`globalThis` 不保留，包装恒为 undefined、静默回退硬编码 1.4，UI 从未生效。已修复为自包含数据流（见 CHANGELOG）。
 ### ③ 工作流（喊人）
 - **名称**：「自发唤醒·λ(t)想她」
 - **目标对话**：Clear Shen卡固定 chat_id
@@ -70,7 +71,7 @@ n1定时(900000ms=15分钟)/n0手动
 ---
 ## 三、内核数学模型
 1. **λ(t)→H(t) 累计风险模型**：H(t) 累计「想她」的风险值，达到随机阈值即 fired
-2. **阈值抽样**：`thresholdSample = -log(uniform) × thresholdMultiplier`（指数分布；系数 1.4 = 阈值调高一点点，均值从 1.0→1.4，越难醒）
+2. **阈值抽样（2026-09-12 更新）**：`thresholdSample = -log(uniform) × thresholdMultiplier`（指数分布；系数 1.4 = 阈值调高一点点，均值从 1.0→1.4，越难醒）。系数在周期创建时由 `entropy.js` 从 `options.thresholdMultiplier` 读取（`engine.js` 的 `wvThMult()` 直读 SharedPreferences 传入，失败回退 1.4）
 3. **冷却门控**：距 `lastSpontaneousWakeAtMs`（最近一次自发唤醒/Agent Run）不足 `cooldownMinutes`（默认 15）→ 返回 `contact_cooldown`，不推进 λ(t) 不累计 H(t)
 4. **3 小时封顶**：`MIN_GAP_MS = clamp(45min×系数, 15min, 180min)`；`MAX_GAP_MS = 180min`（最长不会让对方等超过 3 小时）
 5. **冷却基准写入**：`policy.js` `applyAgentRunRelease` 在 source=spontaneous 时写 `lastSpontaneousWakeAtMs`
@@ -91,6 +92,7 @@ n1定时(900000ms=15分钟)/n0手动
 7. **平台调度器缺陷（2026-08-04 同源）** 卡 RUNNING → 关旧开新，别死磕写法
 8. **2026-09-10 版本碎片导致误判**：根目录 `gated.toolpkg`(9-07 无 UI 读)、tmp 旧拷贝(9-08) 全是旧版，真身是 `Android/data/.../packages/` 下的包。已全部清理整合，以后只认唯一真身
 9. **2026-09-12 记账函数没暴露**：`budget_consume_actual` 只改文件不重载 → 运行时报 Function not found；用 `operit_editor:debug_install_js_package` 强制烧录重载后即暴露
+10. **2026-09-12 globalThis 跨调用丢失（最重要）**：宿主桥 `globalThis.__wvEffectiveThreshold` 注入在 Operit 独立 JS 运行时之间不保留，三处比较静默回退硬编码 1.4，UI 调 4.5 从不生效。修复：`entropy.js` 用 `options.thresholdMultiplier`（默认 1.4）、`engine.js` 新增自包含 `wvThMult()` 直读 SharedPreferences，数据流自包含。教训：任何「宿主桥注入全局变量 → 内核消费」的跨调用方案都不可靠，必须单次调用内传参或直接读存储。
 ---
 ## 六、验证自查流程
 1. `workflow:get_workflow` 查 `lastExecutionTime` / `lastExecutionStatus` 是否在调度
