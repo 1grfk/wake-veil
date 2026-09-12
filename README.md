@@ -96,6 +96,7 @@
 - **9-10**：整合治理完成——清除全部旧拷贝/备份/临时文件，只保留唯一真身（本仓库）+ dev 源码 + 运行时状态三处正式件；同日归档到 GitHub，补充 docs/USAGE.md 使用说明。
 - **9-11**：新增自愈哨兵工作流（`wake_veil_self_heal_sentinel.json`）。
 - **9-12**：工作流升级为「唤醒前取 token → 唤醒 → 唤醒后取 token → 真实差值记账」（`budget_consume_actual`）；新增 `ledger/`（哥哥的消费本 UI，toolpkg_id=`com.shenyu.ledger`，侧边栏工具箱可看今日费用/token/行为明细/历史账本）。
+- **9-12（修复）**：UI 阈值不生效根因修复——`globalThis.__wvEffectiveThreshold` 跨调用丢失，实际回退硬编码 1.4；改为 entropy.js 自带 `thMult` 从 `options.thresholdMultiplier` 读取 + engine.js 新增自包含 `wvThMult()` 直读 SharedPreferences，数据流自包含化。详见 docs/CHANGELOG.md
 
 ## 🛡️ 自愈哨兵（2026-09-11 新增）
 内核可能因设备重启/后台被杀掉回 `disabled_effective`（2026-09-11 实例：晚上自发唤醒失败，报 `spontaneous not enabled, tick skipped`）。

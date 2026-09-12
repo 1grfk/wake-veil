@@ -13,6 +13,17 @@ const { createOneShotWakeScheduler } = require('./scheduler');
 const { createAgentRunFact, createNoopStateInputAdapter, sameAgentRunFact } = require('./state-input');
 const { createWakeSupervisor } = require('./supervisor');
 
+// [2026-09-12 修复] 自包含读取UI阈值系数（不复用globalThis注入，避免跨调用丢失）
+function wvThMult() {
+  try {
+    var raw = String(Java.getApplicationContext().getSharedPreferences('toolpkg_shenyu_wake_veil', 0).getString('wake_veil_config', '') || '').trim();
+    if (!raw) return 1.4;
+    var c = JSON.parse(raw);
+    var m = Number(c.thresholdMultiplier);
+    return (m > 0) ? m : 1.4;
+  } catch (_) { return 1.4; }
+}
+
 function deterministicOpportunityId(cycleId) {
   return 'wk_' + crypto.createHash('sha256').update(`wake:spontaneous:${cycleId}`).digest('hex').slice(0, 24);
 }
@@ -356,6 +367,7 @@ function createStandaloneWakeKernel(options = {}) {
       cycleId,
       nowMs: atMs,
       randomBytes,
+      thresholdMultiplier: wvThMult(),
       policyVersion: policy.policyVersion
     });
     const progress = createCycleProgress(cycleId, atMs, state.stateVersion);
